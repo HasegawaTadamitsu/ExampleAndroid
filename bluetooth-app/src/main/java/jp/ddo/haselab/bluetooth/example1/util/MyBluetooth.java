@@ -28,7 +28,7 @@ public final class MyBluetooth {
         /**
          * 取得完了コールバック
          */
-        public void doneGet(final Map<String,String> arg);
+        public void doneScan(final Map<String,String> arg);
     }
 
 
@@ -61,10 +61,14 @@ public final class MyBluetooth {
 	MyLog.getInstance().verbose("start");
 	this.mBluetoothAdapter =
 	    BluetoothAdapter.getDefaultAdapter();
+
+	// todo throws exception
 	if (mBluetoothAdapter == null) {
 	    MyLog.getInstance().verbose("can not use Bluetooth adpter.");
 	    return  false;
 	}
+
+	// todo throws exception
 	if (!mBluetoothAdapter.isEnabled()){
 	    MyLog.getInstance().verbose("adapter is not enable."
 				+ "[deviceName = " + getAdapterDeviceName()
@@ -101,17 +105,28 @@ public final class MyBluetooth {
 	if (result == false){
 	    return false;
 	}
+	final Handler handler = new Handler();
+	final Runnable postRun = new Runnable() {
+		public void run(){
+		    callback.doneScan(mSearchedDevice);
+		} // run{
+	    }; //Runable()
 
-        final Handler handler = new Handler();
-	handler.post(new Runnable() {
+	final Runnable threadRun =  new Runnable() {
 		public void run() {
-		    while(isDiscovering());
-		    fin();
-		    callback.doneGet(mSearchedDevice);
-		}
-	    });
+		    try{
+			Thread.sleep(10 * 1000);
+		    }catch(InterruptedException e){
+			MyLog.getInstance().error("InterruptedEx",e);
+		    }
+		    finScan();
+		    handler.post( postRun );
+		} // run() {
+	    }; // new runnable()
 	
-
+	     
+	Thread th = new Thread( threadRun );
+	th.start();
 	return true;
     }
 
@@ -128,7 +143,7 @@ public final class MyBluetooth {
 	return mBluetoothAdapter.cancelDiscovery();
     }
 
-    private void fin(){
+    private void finScan(){
 	MyLog.getInstance().verbose("start");
  	checkCalledInit();
 	boolean result = mBluetoothAdapter.cancelDiscovery();

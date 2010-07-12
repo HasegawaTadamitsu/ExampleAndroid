@@ -11,13 +11,16 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.util.Map;
+import android.app.ProgressDialog;
 
 /**
  * 
  */
 public final class ResultActivity extends Activity {
 
-    MyBluetooth mBluetooth;
+    private MyBluetooth mBluetooth;
+    private ProgressDialog mProgressDialog;
+
     /**
      * create. 
      * 各種ボタンのイベント登録など行います。
@@ -43,7 +46,18 @@ public final class ResultActivity extends Activity {
 	    return;
 	}
 
-	mBluetooth.scan(mCallBack);
+	boolean resScan = mBluetooth.scan(mCallBack);
+	if (resScan == false){
+	    text.setText("can not scan.startDiscovery");
+	    return;
+	}
+ 
+	mProgressDialog = new ProgressDialog(this);
+	mProgressDialog.setTitle("scan...");
+	mProgressDialog.setMessage("scan");
+	mProgressDialog.setIndeterminate(false);
+	mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+	mProgressDialog.show();
 	return ;
     }
 
@@ -51,13 +65,14 @@ public final class ResultActivity extends Activity {
 
 	    @SuppressWarnings("synthetic-access")
                 @Override
-                public void doneGet(final Map<String,String>  arg) {
+                public void doneScan(final Map<String,String>  arg) {
 
+		mProgressDialog.dismiss();
 		TextView text;
 		text = (TextView) findViewById(R.id.textview_result);
 		
 		if (arg.size() == 0) {
-		    text.setText("empty devices.");
+		    text.setText("fin scan. but empty devices.");
 		    return;
 		}
 
@@ -67,10 +82,6 @@ public final class ResultActivity extends Activity {
 		}
 		text.setText(str.toString());
 		
-		Toast.makeText(ResultActivity.this,
-			       "OK",
-			       Toast.LENGTH_SHORT)
-		    .show();
 		return;
 	    }
 	};

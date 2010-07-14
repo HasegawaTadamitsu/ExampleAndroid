@@ -3,15 +3,15 @@ package jp.ddo.haselab.bluetooth.example1.main;
 import jp.ddo.haselab.bluetooth.example1.util.MyLog;
 import jp.ddo.haselab.bluetooth.example1.util.MyBluetooth;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 import java.util.Map;
-import android.app.ProgressDialog;
 
 /**
  * 
@@ -20,6 +20,7 @@ public final class ResultActivity extends Activity {
 
     private MyBluetooth mBluetooth;
     private ProgressDialog mProgressDialog;
+    private static final String MSSAGE ="scan";
 
     /**
      * create. 
@@ -36,7 +37,8 @@ public final class ResultActivity extends Activity {
         MyLog.getInstance().verbose("start");
         setContentView(R.layout.result);
 
-	this.mBluetooth = new MyBluetooth(this);
+	final int timeoutTimeSecond = 5;
+	this.mBluetooth = new MyBluetooth(this,timeoutTimeSecond);
         TextView text;
         text = (TextView) findViewById(R.id.textview_result);
 
@@ -46,7 +48,7 @@ public final class ResultActivity extends Activity {
 	    return;
 	}
 
-	boolean resScan = mBluetooth.scan(mCallBack);
+	boolean resScan = this.mBluetooth.scan(mCallBack);
 	if (resScan == false){
 	    text.setText("can not scan.startDiscovery");
 	    return;
@@ -54,20 +56,31 @@ public final class ResultActivity extends Activity {
  
 	mProgressDialog = new ProgressDialog(this);
 	mProgressDialog.setTitle("scan...");
-	mProgressDialog.setMessage("scan");
+	mProgressDialog.setMessage(MSSAGE);
 	mProgressDialog.setIndeterminate(false);
-	mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+	mProgressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+	mProgressDialog.setCancelable(true);
+	mProgressDialog.setMax(timeoutTimeSecond);
+	mProgressDialog.setButton("cancel",
+	    new DialogInterface.OnClickListener() {
+		public void onClick(DialogInterface dialog,int hoge) {
+		    mBluetooth.cancel();
+		}
+	    }
+					    );
 	mProgressDialog.show();
+
 	return ;
     }
+
 
     MyBluetooth.Callback mCallBack = new MyBluetooth.Callback() {
 
 	    @SuppressWarnings("synthetic-access")
                 @Override
                 public void doneScan(final Map<String,String>  arg) {
-
 		mProgressDialog.dismiss();
+
 		TextView text;
 		text = (TextView) findViewById(R.id.textview_result);
 		
@@ -78,11 +91,22 @@ public final class ResultActivity extends Activity {
 
 		StringBuilder str = new StringBuilder();
 		for(Map.Entry<String, String> e : arg.entrySet()) {
-		    str.append(e.getKey() + " : " + e.getValue() + "--");
+		    str.append(e.getKey() + " : " + e.getValue() + "\n");
 		}
 		text.setText(str.toString());
 		
 		return;
+	    }
+	    @Override
+                public void progress(final float var,
+				     final int findCount){
+		mProgressDialog.setProgress((int)var);
+		if(findCount != 0){
+		    mProgressDialog.setMessage(MSSAGE
+					       + "  "
+					       + findCount 
+					       +" found");
+		}
 	    }
 	};
 }

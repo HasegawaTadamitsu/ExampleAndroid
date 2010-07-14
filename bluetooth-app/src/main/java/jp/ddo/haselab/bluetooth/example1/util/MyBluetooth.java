@@ -8,11 +8,8 @@ import android.content.Intent;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Handler;
-import java.util.Set;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 
@@ -29,17 +26,25 @@ public final class MyBluetooth {
          * 取得完了コールバック
          */
         public void doneScan(final Map<String,String> arg);
+        /**
+         * progress
+         */
+        public void progress(final float progressValue,
+			     final int findCount);
     }
 
 
-    public MyBluetooth(final Context arg){
-	mContext = arg;
+    public MyBluetooth(final Context arg1,final int arg2){
+	mContext = arg1;
+	mTimeoutSecond = arg2;
 	mSearchedDevice = new HashMap<String,String>();
     }
 
     private BluetoothAdapter   mBluetoothAdapter;
     private Map<String,String> mSearchedDevice;
     private Context            mContext;
+    private final int mTimeoutSecond;
+    private  float mProgressValue = 0;
 
     public Map<String,String> getSearchedDevice(){
 	return mSearchedDevice;
@@ -105,22 +110,39 @@ public final class MyBluetooth {
 	if (result == false){
 	    return false;
 	}
+	final int progressSplitTime = 10;
+	mProgressValue = 0;
 	final Handler handler = new Handler();
-	final Runnable postRun = new Runnable() {
+	final Runnable postFinishRun = new Runnable() {
 		public void run(){
 		    callback.doneScan(mSearchedDevice);
+		} // run{
+	    }; //Runable()
+	final Runnable postProgressRun = new Runnable() {
+		public void run(){
+		    callback.progress(mProgressValue,
+				      mSearchedDevice.size());
 		} // run{
 	    }; //Runable()
 
 	final Runnable threadRun =  new Runnable() {
 		public void run() {
-		    try{
-			Thread.sleep(10 * 1000);
-		    }catch(InterruptedException e){
-			MyLog.getInstance().error("InterruptedEx",e);
+		    for(int i=0; i < progressSplitTime;i++){
+			try{
+			    Thread.sleep(mTimeoutSecond * 1000 /
+					 progressSplitTime);
+			}catch(InterruptedException e){
+			    MyLog.getInstance().error("InterruptedEx",e);
+			}
+			mProgressValue += ((float)mTimeoutSecond)/
+			    ((float)progressSplitTime);
+			handler.post( postProgressRun );
+			if (isDiscovering() == false){
+			    break;
+			}
 		    }
 		    finScan();
-		    handler.post( postRun );
+		    handler.post( postFinishRun );
 		} // run() {
 	    }; // new runnable()
 	
@@ -138,6 +160,7 @@ public final class MyBluetooth {
 
     public boolean cancel(){
 	if (!isDiscovering()){
+
 	    return true;
 	}
 	return mBluetoothAdapter.cancelDiscovery();

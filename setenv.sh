@@ -12,4 +12,5 @@ alias start_androidx86  ${ANDROID_HOME}/tools/adb connect patrush-android:5555
 alias start_debugger ${ANDROID_HOME}/tools/ddms
 alias compile_all 'mvn clean &&mvn package&&mvn_deploy'
 alias comp 'mvn clean &&mvn package'
+alias logcat '${ANDROID_HOME}/tools/adb logcat'
 

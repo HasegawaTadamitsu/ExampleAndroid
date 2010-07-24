@@ -1,8 +1,7 @@
 
-package jp.ddo.haselab.bluetooth.example1.util;
+package jp.ddo.haselab.location.example1.util;
 
 import java.util.regex.Pattern;
-
 import android.util.Log;
 
 /**

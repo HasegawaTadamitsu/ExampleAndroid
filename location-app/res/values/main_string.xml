@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string name="app_name">
-    bluetooth example
+    location example
   </string>
-  <string name="button_text_start">
-    start
+  <string name="button_text_start_map">
+    google map start
+  </string>
+  <string name="button_text_start_gps">
+    gps start
   </string>
 </resources>

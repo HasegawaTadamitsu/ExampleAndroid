@@ -12,6 +12,7 @@
 	<category android:name="android.intent.category.DEFAULT" />
       </intent-filter>
     </activity>
+    <activity android:name=".MyMapActivity" />
     <uses-library android:name="com.google.android.maps" />
   </application>
   <uses-permission 

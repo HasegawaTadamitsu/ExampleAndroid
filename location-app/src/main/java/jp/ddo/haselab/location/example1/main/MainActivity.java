@@ -1,7 +1,7 @@
 
-package jp.ddo.haselab.bluetooth.example1.main;
+package jp.ddo.haselab.location.example1.main;
 
-import jp.ddo.haselab.bluetooth.example1.util.MyLog;
+import jp.ddo.haselab.location.example1.util.MyLog;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -29,10 +29,10 @@ public final class MainActivity extends
     public void onClick(final View v) {
 
         int id = v.getId();
-        if (id == R.id.button_start) {
+        if (id == R.id.button_start_map) {
             MyLog.getInstance().verbose("start button");
-            Intent intent = new Intent(this, ResultActivity.class);
-            startActivity(intent);
+	    Intent intent = new Intent(this, MyMapActivity.class);
+	    startActivity(intent);
             return;
         }
         return;
@@ -55,7 +55,7 @@ public final class MainActivity extends
         setContentView(R.layout.main);
 
         Button button;
-        button = (Button) findViewById(R.id.button_start);
+        button = (Button) findViewById(R.id.button_start_map);
         button.setOnClickListener(this);
     }
 

@@ -108,6 +108,7 @@ public final class MyBluetooth {
 	mContext.registerReceiver(mReceiver, filter); 
 	boolean result = mBluetoothAdapter.startDiscovery();
 	if (result == false){
+	    mContext.unregisterReceiver(mReceiver);
 	    return false;
 	}
 	final int progressSplitTime = 10;

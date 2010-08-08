@@ -9,4 +9,25 @@
   <string name="button_text_start_gps">
     gps start
   </string>
+  <string name="gps_address">
+    address
+  </string>
+  <string name="gps_latitude">
+    latitude
+  </string>
+  <string name="gps_longitude">
+    longitude
+  </string>
+  <string name="gps_altitude">
+    altitude
+  </string>
+  <string name="gps_accuracy">
+    accuracy
+  </string>
+  <string name="gps_speed">
+    speed
+  </string>
+  <string name="gps_bearing">
+    bearing
+  </string>
 </resources>
